@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  webapp:
+    image: xillianvh/webapp:latest  # Use the Docker Hub image
+    container_name: webapp
+    ports:
+      - "3000:3000"
+    environment:
+      MYSQL_URL: ${MYSQL_URL}
+    depends_on:
+      - database
+    restart: always
+
+  database:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  test:
+    image: xillianvh/webapp:latest  # Use the same Docker Hub image for tests
+    depends_on:
+      - webapp
+    environment:
+      - API_URL=http://webapp:3000
+    command: ["yarn", "test"]  # Run the tests
+
+volumes:
+  mysql_data:

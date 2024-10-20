@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: .
+    container_name: webapp
+    ports:
+      - "3000:3000"
+    environment:
+      MYSQL_URL: ${MYSQL_URL}  # Use the correct MYSQL_URL
+    depends_on:
+      - database  # Ensure the database starts before the webapp
+    restart: always
+
+  database:
+    image: mysql:8.0  # Use the official MySQL image
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Set MySQL root password
+      MYSQL_DATABASE: ${MYSQL_DATABASE}  # Create a database named 'mydatabase'
+      MYSQL_USER: ${MYSQL_USER}  # Create a new user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Set the user's password
+    volumes:
+      - mysql_data:/var/lib/mysql  # Use a named volume to persist MySQL data
+
+  test:
+    build: .
+    depends_on:
+      - webapp
+    environment:
+      - API_URL=http://webapp:3000  # Use the service name as hostname
+    command: ["yarn", "test"]  # Command to run tests
+volumes:
+  mysql_data:  # Define the named volume for MySQL data persistence

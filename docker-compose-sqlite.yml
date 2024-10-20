@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: .
+    container_name: webapp-container
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./database:/app/database
+    restart: always
