@@ -1,15 +1,17 @@
-name: Build and test
+name: Build
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -17,6 +19,14 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+
+      - name: Start the server
+        run: |
+          nohup yarn start &  # Start the server in the background
+          sleep 5             # Wait for the server to fully start
+
+      - name: Run tests
+        run: yarn test
 
       - name: Lint the code
         run: yarn lint
@@ -33,4 +43,4 @@ jobs:
           context: .
           file: Dockerfile
           tags: xillianvh/webapp:latest
-          push: true  # Push the image to Docker Hub
+          push: true
